@@ -170,15 +170,18 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 
 	w.Header().Set("X-Duration-Seconds", fmt.Sprintf("%f", time.Since(startedTime).Seconds()))
 
+	fmt.Println("xxx 1")
 	w.WriteHeader(res.StatusCode)
 	if res.Body != nil {
 		defer res.Body.Close()
 
 		scan := bufio.NewScanner(res.Body)
 		for scan.Scan() {
+			fmt.Println("xxx 2")
 			if _, bodyErr := w.Write(scan.Bytes()); err != nil {
 				log.Println("read body err", bodyErr)
 			}
+			fmt.Println("xxx 3")
 			w.(http.Flusher).Flush()
 		}
 		if scanErr := scan.Err(); scanErr != nil {
