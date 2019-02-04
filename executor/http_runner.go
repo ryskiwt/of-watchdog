@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -169,14 +170,19 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 
 	w.Header().Set("X-Duration-Seconds", fmt.Sprintf("%f", time.Since(startedTime).Seconds()))
 
-	w.Header().Set("Transfer-Encoding", "chunked")
-	res.ContentLength = -1
-
 	w.WriteHeader(res.StatusCode)
 	if res.Body != nil {
 		defer res.Body.Close()
-		if _, bodyErr := io.Copy(w, res.Body); err != nil {
-			log.Println("read body err", bodyErr)
+
+		scan := bufio.NewScanner(res.Body)
+		for scan.Scan() {
+			if _, bodyErr := w.Write(scan.Bytes()); err != nil {
+				log.Println("read body err", bodyErr)
+			}
+			w.(http.Flusher).Flush()
+		}
+		if scanErr := scan.Err(); scanErr != nil {
+			log.Println("read body err", scanErr)
 		}
 	}
 
