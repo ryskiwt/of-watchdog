@@ -124,9 +124,12 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 	request.Host = r.Host
 	copyHeaders(request.Header, &r.Header)
 
-	ctx, cancel := context.WithTimeout(context.Background(), f.ExecTimeout)
-
-	defer cancel()
+	ctx := context.Background()
+	if f.ExecTimeout != 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, f.ExecTimeout)
+		defer cancel()
+	}
 
 	res, err := f.Client.Do(request.WithContext(ctx))
 
