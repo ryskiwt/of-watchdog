@@ -172,12 +172,9 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 	w.WriteHeader(res.StatusCode)
 	if res.Body != nil {
 		defer res.Body.Close()
-
-		bodyBytes, bodyErr := ioutil.ReadAll(res.Body)
-		if bodyErr != nil {
+		if _, bodyErr := io.Copy(w, res.Body); err != nil {
 			log.Println("read body err", bodyErr)
 		}
-		w.Write(bodyBytes)
 	}
 
 	log.Printf("%s %s - %s - ContentLength: %d", r.Method, r.RequestURI, res.Status, res.ContentLength)
