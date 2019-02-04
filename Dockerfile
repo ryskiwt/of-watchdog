@@ -1,7 +1,7 @@
 FROM golang:1.9.4
 
-RUN mkdir -p /go/src/github.com/openfaas-incubator/of-watchdog
-WORKDIR /go/src/github.com/openfaas-incubator/of-watchdog
+RUN mkdir -p /go/src/github.com/ryskiwt/of-watchdog
+WORKDIR /go/src/github.com/ryskiwt/of-watchdog
 
 COPY main.go    .
 COPY config     config

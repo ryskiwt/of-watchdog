@@ -15,8 +15,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/openfaas-incubator/of-watchdog/config"
-	"github.com/openfaas-incubator/of-watchdog/executor"
+	"github.com/ryskiwt/of-watchdog/config"
+	"github.com/ryskiwt/of-watchdog/executor"
 )
 
 var (
