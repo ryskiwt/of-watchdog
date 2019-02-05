@@ -170,6 +170,10 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 
 	w.Header().Set("X-Duration-Seconds", fmt.Sprintf("%f", time.Since(startedTime).Seconds()))
 
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Transfer-Encoding", "chunked")
+	res.ContentLength = -1
+
 	w.WriteHeader(res.StatusCode)
 	if res.Body != nil {
 		defer res.Body.Close()
