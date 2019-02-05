@@ -1,7 +1,6 @@
 package executor
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -10,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"os/exec"
@@ -170,23 +170,12 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 
 	w.Header().Set("X-Duration-Seconds", fmt.Sprintf("%f", time.Since(startedTime).Seconds()))
 
-	w.Header().Set("Content-Type", "text/plain")
-	w.Header().Set("Transfer-Encoding", "chunked")
-	res.ContentLength = -1
-
 	w.WriteHeader(res.StatusCode)
 	if res.Body != nil {
 		defer res.Body.Close()
 
-		scan := bufio.NewScanner(res.Body)
-		for scan.Scan() {
-			if _, bodyErr := w.Write([]byte(scan.Text() + "\n")); bodyErr != nil {
-				log.Println("read body err", bodyErr)
-			}
-			w.(http.Flusher).Flush()
-		}
-		if scanErr := scan.Err(); scanErr != nil {
-			log.Println("read body err", scanErr)
+		if _, bodyErr := io.Copy(w, httputil.NewChunkedReader(res.Body)); bodyErr != nil {
+			log.Println("read body err", bodyErr)
 		}
 	}
 
