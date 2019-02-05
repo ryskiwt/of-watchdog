@@ -174,7 +174,7 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 	if res.Body != nil {
 		defer res.Body.Close()
 
-		if _, bodyErr := io.Copy(w, httputil.NewChunkedReader(res.Body)); bodyErr != nil {
+		if _, bodyErr := io.Copy(httputil.NewChunkedWriter(w), res.Body); bodyErr != nil {
 			log.Println("read body err", bodyErr)
 		}
 	}
