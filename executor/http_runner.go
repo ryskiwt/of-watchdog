@@ -186,7 +186,8 @@ func (f *HTTPFunctionRunner) Run(req FunctionRequest, contentLength int64, r *ht
 				log.Println("read body err", scanErr)
 			}
 		} else {
-			if _, bodyErr := io.Copy(w, res.Body); bodyErr != nil {
+
+			if _, bodyErr := io.CopyN(w, res.Body, 256); bodyErr != nil {
 				log.Println("read body err", bodyErr)
 			}
 		}
